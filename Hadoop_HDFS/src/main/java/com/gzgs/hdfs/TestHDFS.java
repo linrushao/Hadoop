@@ -36,34 +36,34 @@ public class TestHDFS {
     //回收站
     @Test
     public void testTrash() throws IOException {
-        conf.set("fs.trash.interval","1");
-        conf.set("fs.trash.checkpoint.interval","1");
+        conf.set("fs.trash.interval", "1");
+        conf.set("fs.trash.checkpoint.interval", "1");
         //创建回收站对象
-        Trash trash = new Trash(fs,conf);
+        Trash trash = new Trash(fs, conf);
         String s = conf.get("fs.trash.interval");
-        System.out.println("s = "+s);
+        System.out.println("s = " + s);
         trash.moveToTrash(new Path("/Test.txt"));
 
     }
 
     @Test
     public void testlistAllFileAndDir() throws IOException {
-        listAllFileAndDir("/",fs);
+        listAllFileAndDir("/", fs);
     }
 
-    public void listAllFileAndDir(String path , FileSystem fs) throws IOException {
+    public void listAllFileAndDir(String path, FileSystem fs) throws IOException {
         //先获取指定path下的所有文件和目录
         FileStatus[] listStatus = fs.listStatus(new Path(path));
         //迭代listStatus数组，判断是文件还是目录
-        for(FileStatus status : listStatus){
-            if(status.isFile()){
+        for (FileStatus status : listStatus) {
+            if (status.isFile()) {
                 //文件
-                System.out.println("File:"+status.getPath().toString());
-            }else{
+                System.out.println("File:" + status.getPath().toString());
+            } else {
                 //目录
                 System.out.println("Dir:" + status.getPath().toString());
                 //获取当前目录下的所有的文件和目录
-                listAllFileAndDir(status.getPath().toString(),fs);
+                listAllFileAndDir(status.getPath().toString(), fs);
             }
         }
     }
@@ -79,7 +79,7 @@ public class TestHDFS {
         //输出流
         FileOutputStream fos = new FileOutputStream(new File(destFile));
         //流的对拷
-        IOUtils.copyBytes(fis,fos,conf);
+        IOUtils.copyBytes(fis, fos, conf);
         //关闭
         IOUtils.closeStream(fis);
         IOUtils.closeStream(fos);
@@ -104,7 +104,7 @@ public class TestHDFS {
 //            fos.write(buffer,0,i);
 //        }
 
-        IOUtils.copyBytes(fis,fos,conf);
+        IOUtils.copyBytes(fis, fos, conf);
         //关闭流
         IOUtils.closeStream(fis);
         IOUtils.closeStream(fos);
@@ -117,14 +117,15 @@ public class TestHDFS {
 
     /**
      * 参数的优先级
-     *
+     * <p>
      * xxx-default.xml < xxx.site.xml < IDEA中添加的xxx-site.xml < 在代码中通过Configuration对象设置
+     *
      * @throws IOException
      */
 
     //打印fs
     @Test
-    public void testfs(){
+    public void testfs() {
         System.out.println(fs.getClass().getName());
     }
 
@@ -135,10 +136,10 @@ public class TestHDFS {
         boolean delete = fs.delete(new Path("/test.txt"), false);
 
         //删除目录 如果目录非空，传true或者false都可以，如果目录非空，则需要传入true进行递归删除
-        fs.delete(new Path("/test"),false);
+        fs.delete(new Path("/test"), false);
 
         //走回收站的删除方式
-        Trash trash = new Trash(fs,conf);
+        Trash trash = new Trash(fs, conf);
         String s = conf.get("fs.trash.interval");
         System.out.println(s);
 
@@ -152,11 +153,11 @@ public class TestHDFS {
     @Test
     public void testListStatus() throws IOException {
         FileStatus[] listStatus = fs.listStatus(new Path("/"));
-        for(FileStatus status : listStatus){
-            if(status.isFile()){
-                System.out.println("File : "+status.getPath());
-            }else {
-                System.out.println("Dir : "+status.getPath());
+        for (FileStatus status : listStatus) {
+            if (status.isFile()) {
+                System.out.println("File : " + status.getPath());
+            } else {
+                System.out.println("Dir : " + status.getPath());
             }
         }
     }
@@ -164,15 +165,15 @@ public class TestHDFS {
     //文件详情查看
     @Test
     public void testListFiles() throws IOException {
-        RemoteIterator<LocatedFileStatus> listFiles = fs.listFiles(new Path("/"),true);
+        RemoteIterator<LocatedFileStatus> listFiles = fs.listFiles(new Path("/"), true);
         //迭代
-        while(listFiles.hasNext()){
+        while (listFiles.hasNext()) {
             //取出下一个
             LocatedFileStatus fileStatus = listFiles.next();
             //获取文件的详情
             System.out.println("文件的路径：" + fileStatus.getPath());
             System.out.println("文件权限：" + fileStatus.getPermission());
-            System.out.println("文件主人："  + fileStatus.getOwner());
+            System.out.println("文件主人：" + fileStatus.getOwner());
             System.out.println("文件组： " + fileStatus.getGroup());
             System.out.println("文件大小：" + fileStatus.getLen());
             System.out.println("文件副本数： " + fileStatus.getReplication());
@@ -202,23 +203,24 @@ public class TestHDFS {
      */
     @Test
     public void testDownload() throws IOException {
-        fs.copyToLocalFile(false,new Path("/testhdfs/TestReturnArray.txt"),new Path("D:/Atest"),true);
+        fs.copyToLocalFile(false, new Path("/testhdfs/TestReturnArray.txt"), new Path("D:/Atest"), true);
     }
 
     /**
      * 文件的上传
+     *
      * @throws IOException
      */
     @Test
     public void testUpload() throws IOException {
-        fs.copyFromLocalFile(false,true,new Path("D:/BaiduNetdiskDownload/TestReturnArray.txt"),new Path("/testhdfs"));
+        fs.copyFromLocalFile(false, true, new Path("D:/BaiduNetdiskDownload/TestReturnArray.txt"), new Path("/testhdfs"));
     }
 
     /**
      * @Before注解标注的方法会在所有@Test标注的方法执行之前执行
      */
     @Before
-    public void init() throws IOException, InterruptedException  {
+    public void init() throws IOException, InterruptedException {
         uri = URI.create("hdfs://hadoop201:8020");
         //uri = new URI("hdfs://hadoop201:8020);
         conf = new Configuration();
@@ -226,17 +228,17 @@ public class TestHDFS {
         //设置副本数
         //conf.set("dfs.replication","1");
 
-        conf.set("fs.trash.interval","1");
-        conf.set("fs.trash.checkpoint.interval","1");
+        conf.set("fs.trash.interval", "1");
+        conf.set("fs.trash.checkpoint.interval", "1");
 //        conf.set("fs.defaultFS","hdfs://hadoop201:8020");
 
         user = "linrushao";
-        fs = FileSystem.get(uri,conf,user);
+        fs = FileSystem.get(uri, conf, user);
     }
 
     /**
-     * @After注解标注的方法会在所有@Test标注的方法执行结束后执行
      * @throws IOException
+     * @After注解标注的方法会在所有@Test标注的方法执行结束后执行
      */
     @After
     public void close() throws IOException {
@@ -246,11 +248,11 @@ public class TestHDFS {
     @Test
     public void testHDFS() throws IOException, InterruptedException {
         //1、创建文件系统对象
-        URI uri = URI.create("hdfs://hadoop201:8020");
+        URI uri = URI.create("hdfs://master:8020");
         Configuration conf = new Configuration();
-        String user = "linrushao";
-        FileSystem fs = FileSystem.get(uri,conf,user);
-        System.out.println("fs = "+fs);
+        String user = "root";
+        FileSystem fs = FileSystem.get(uri, conf, user);
+        System.out.println("fs = " + fs);
 
         //2、创建一个目录
         boolean b = fs.mkdirs(new Path("/testhdfs"));
